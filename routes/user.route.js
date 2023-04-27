@@ -94,8 +94,29 @@ userRouter.patch("/edit/:id",async(req,res)=>{
 
         if(decoded){
             const user = await UserModel.findByIdAndUpdate({_id:id},data)
+            console.log(decoded)
 
             res.send("user details updated")
+        }
+         
+      });
+
+})
+
+userRouter.get("/details/",async(req,res)=>{
+
+    
+
+
+    let token = req.headers.authorization
+
+    jwt.verify(token, process.env.secret_key, async function(err, decoded) {
+
+        if(decoded){
+            const user = await UserModel.findOne({_id:decoded.userId})
+            
+
+            res.send(user)
         }
          
       });
