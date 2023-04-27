@@ -7,10 +7,12 @@ app.use(express.json())
 require('dotenv').config()
 
 const {connection} = require("./config/db.js")
+const {userRouter} = require("./routes/user.route.js")
 
 app.get("/",(req,res)=>{
     res.send("hello")
 })
+app.use("/",userRouter)
 
 app.listen(process.env.port,async()=>{
 
