@@ -2,6 +2,7 @@
 const express = require("express")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
+const fs = require("fs")
 
 const userRouter = express.Router()
 require('dotenv').config()
@@ -58,6 +59,25 @@ userRouter.post("/login",async (req,res)=>{
         console.log(error)
     }
 })
+
+// -------------------------------Logout-----------------------------------------
+
+userRouter.post("/logout",async(req,res)=>{
+    let token = req.headers.authorization
+
+    try {
+
+        let blacklist = JSON.parse(fs.readFileSync("./blacklist.json","utf-8"))
+
+        blacklist.push(token)
+        fs.writeFileSync("./blacklist.json",JSON.stringify(blacklist))
+        
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+
 
 
 module.exports = {userRouter}
