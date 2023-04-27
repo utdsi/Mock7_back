@@ -36,15 +36,16 @@ userRouter.post("/login",async (req,res)=>{
 
     try {
         
-        const user = UserModel.findOne({email})
-        if(user){
-            const hash_password = user.password
+        const user = await UserModel.find({email})
+        
+        if(user.length>0){
+            const hash_password = user[0].password
 
             bcrypt.compare(password, hash_password, function(err, result) {
                 // result == true
                 if(result){
 
-                    const token = jwt.sign({ "userId":user._id }, process.env.secret_key);
+                    const token = jwt.sign({ "userId":user[0]._id }, process.env.secret_key);
 
                     res.send({"msg":"login successfull","token":token})
                 }else{
@@ -71,10 +72,34 @@ userRouter.post("/logout",async(req,res)=>{
 
         blacklist.push(token)
         fs.writeFileSync("./blacklist.json",JSON.stringify(blacklist))
+        res.send("logout successfull")
         
     } catch (error) {
         console.log(error)
     }
+})
+
+
+// -----------------------------------edit_details--------------------------------
+
+userRouter.patch("/edit/:id",async(req,res)=>{
+
+    const id  = req.params.id
+
+    let data = req.body
+
+    let token = req.headers.authorization
+
+    jwt.verify(token, process.env.secret_key, async function(err, decoded) {
+
+        if(decoded){
+            const user = await UserModel.findByIdAndUpdate({_id:id},data)
+
+            res.send("user details updated")
+        }
+         
+      });
+
 })
 
 
